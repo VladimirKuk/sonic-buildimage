@@ -65,6 +65,33 @@ module sonic-vxlan {
             }
         }
 
+        container VXLAN_REMOTE_TUNNEL {
+
+            description "config db VXLAN_REMOTE_TUNNEL table";
+
+            list VXLAN_REMOTE_TUNNEL_LIST {
+
+                key "name";
+                max-elements 1;
+
+                leaf name {
+                /* vni devices are created of the form 'name'-vlanid
+                   The kernel has a max limit of 15 chars for netdevices.
+                   keeping aside 5 chars for hyphen and vlanid the
+                   name should have a max of 10 chars */
+
+                    type string {
+                        length 1..10;
+                    }
+                }
+
+                leaf src_ip {
+                    type inet:ip-address;
+                }
+            }
+        }
+
+
         container VXLAN_TUNNEL_MAP {
 
             description "config db VXLAN_TUNNEL_MAP table";
@@ -100,6 +127,31 @@ module sonic-vxlan {
                 }
             }
         }
+
+        container VXLAN_REMOTE_TUNNEL_MAP {
+
+            description "config db VXLAN_REMOTE_TUNNEL_MAP table";
+
+            list VXLAN_REMOTE_TUNNEL_MAP_LIST {
+                key "name mapname";
+
+                leaf name {
+                    type leafref {
+                        path "/svxlan:sonic-vxlan/svxlan:VXLAN_REMOTE_TUNNEL/svxlan:VXLAN_REMOTE_TUNNEL_LIST/svxlan:name";
+                    }
+                }
+
+                leaf mapname {
+                    type string;
+                }
+
+                leaf vni {
+                    mandatory true;
+                    type stypes:vnid_type;
+                }
+            }
+        }
+
 
         container VXLAN_EVPN_NVO {
 
